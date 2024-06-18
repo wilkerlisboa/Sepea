@@ -1,61 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import emailjs from 'emailjs-com';
+import React, { useState, useEffect } from "react";
+import emailjs from "emailjs-com";
+import { z } from "zod";
+import { Button, Form } from "react-bootstrap";
+import mask from "../utils/maascaraCpfCnpj";
+
+const formSchema = z.object({
+  nome_orgao: z.string().min(1, "Nome do órgão público é obrigatório"),
+  nome_gestor: z.string().min(1, "Nome do gestor é obrigatório"),
+  cpf_gestor: z
+    .string()
+    .min(14, "CPF deve ter no mínimo 11 caracteres")
+    .max(14, "CPF deve ter no máximo 11 caracteres"),
+  nome_tecnico: z.string().min(1, "Nome do técnico é obrigatório"),
+  cpf_tecnico: z
+    .string()
+    .min(14, "CPF deve ter no mínimo 11 caracteres")
+    .max(14, "CPF deve ter no máximo 11 caracteres"),
+  contato_tecnico: z.string().min(1, "Contato do técnico é obrigatório"),
+  nome_beneficiario: z.string().min(1, "Nome do beneficiário é obrigatório"),
+  cpf_beneficiario: z
+    .string()
+    .min(14, "CPF deve ter no mínimo 11 caracteres")
+    .max(14, "CPF deve ter no máximo 11 caracteres"),
+  contato_beneficiario: z
+    .string()
+    .min(1, "Contato do beneficiário é obrigatório"),
+  loteamento: z.string().min(1, "Nome do loteamento é obrigatório"),
+  endereco: z.string().min(1, "Endereço é obrigatório"),
+  tamanho: z.string().min(1, "Tamanho do lote é obrigatório"),
+  coordenada: z.string().min(1, "Coordenada é obrigatória"),
+  caracterize: z.string().min(1, "Caracterização é obrigatória"),
+  especifique: z.string().min(1, "Especificação é obrigatória"),
+  geotecnicos: z.string().min(1, "Informação geotécnica é obrigatória"),
+  recuperacao: z.string().min(1, "Informação sobre recuperação é obrigatória"),
+  comprovacao: z.string().min(1, "Comprovação é obrigatória"),
+  habitabilidade: z.string().min(1, "Habitabilidade é obrigatória"),
+  garantia: z.string().min(1, "Garantia é obrigatória"),
+});
 
 function Formulario() {
+  const apiPublic = process.env.REACT_APP_PUBLIC;
+  const service = process.env.REACT_APP_SERVICE;
+  const template = process.env.REACT_APP_TEMPLATE;
+
+  const [errors, setErrors] = useState({});
+
   const [formData, setFormData] = useState({
-    nome_orgao: '',
-    nome_gestor: '',
-    cpf_gestor: '',
-    nome_tecnico: '',
-    cpf_tecnico: '',
-    contato_tecnico: '',
-    nome_beneficiario: '',
-    cpf_beneficiario: '',
-    contato_beneficiario: '',
-    loteamento: '',
-    endereco: '',
-    tamanho: '',
-    coordenada: '',
-    caracterize: '',
-    especifique: '',
-    geotecnicos: '',
-    recuperacao: '',
-    comprovacao: '',
-    habitabilidade: '',
-    garantia: ''
+    nome_orgao: "",
+    nome_gestor: "",
+    cpf_gestor: "",
+    nome_tecnico: "",
+    cpf_tecnico: "",
+    contato_tecnico: "",
+    nome_beneficiario: "",
+    cpf_beneficiario: "",
+    contato_beneficiario: "",
+    loteamento: "",
+    endereco: "",
+    tamanho: "",
+    coordenada: "",
+    caracterize: "",
+    especifique: "",
+    geotecnicos: "",
+    recuperacao: "",
+    comprovacao: "",
+    habitabilidade: "",
+    garantia: "",
   });
 
   useEffect(() => {
-    emailjs.init('1bZVq8TPEQuEYlSfU');
-  }, []);
+    emailjs.init(`${apiPublic}`);
+  }, [apiPublic]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    emailjs.send('service_w1pnqoo', 'template_tulesef', formData)
-      .then((response) => {
-        console.log('E-mail enviado com sucesso!', response.status, response.text);
-        window.location.href = '/achievement';
-      }, (error) => {
-        console.error('Erro ao enviar e-mail:', error);
-        window.location.href = '/erro';
+
+    const result = formSchema.safeParse(formData);
+
+    if (!result.success) {
+      const formattedErrors = {};
+      result.error.errors.forEach((error) => {
+        formattedErrors[error.path[0]] = error.message;
       });
+      setErrors(formattedErrors);
+      return;
+    }
+    setErrors({});
+
+    emailjs.send(`${service}`, `${template}`, formData).then(
+      (response) => {
+        console.log(
+          "E-mail enviado com sucesso!",
+          response.status,
+          response.text
+        );
+        window.location.href = "/achievement";
+      },
+      (error) => {
+        console.error("Erro ao enviar e-mail:", error);
+        window.location.href = "/erro";
+      }
+    );
   };
 
   return (
     <div className="row justify-content-center mt-4">
       <div className="col-12 col-md-6">
-        <h3 className="text-center texto">Qualificação do Órgão Requisitante.</h3>
+        <h3 className="text-center texto">
+          Qualificação do Órgão Requisitante.
+        </h3>
         <form id="contact-form" onSubmit={handleSubmit}>
           <div className="mb-3 mt-4">
-            <label htmlFor="nome_orgao" className="form-label">Nome do Órgão Público</label>
-            <input
+            <label htmlFor="nome_orgao" className="form-label">
+              Nome do Órgão Público
+            </label>
+            <Form.Control
               type="text"
               name="nome_orgao"
               className="form-control"
@@ -63,11 +129,17 @@ function Formulario() {
               placeholder="Digite o nome do órgão público"
               value={formData.nome_orgao}
               onChange={handleChange}
+              isInvalid={!!errors?.nome_orgao}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.nome_orgao}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="nome_gestor" className="form-label">Nome do Gestor do Órgão Público</label>
-            <input
+            <label htmlFor="nome_gestor" className="form-label">
+              Nome do Gestor do Órgão Público
+            </label>
+            <Form.Control
               type="text"
               name="nome_gestor"
               className="form-control"
@@ -75,23 +147,36 @@ function Formulario() {
               placeholder="Digite o nome do gestor do órgão público"
               value={formData.nome_gestor}
               onChange={handleChange}
+              isInvalid={!!errors?.nome_gestor}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.nome_gestor}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="cpf_gestor" className="form-label">CPF do Gestor</label>
-            <input
-              type="number"
+            <label htmlFor="cpf_gestor" className="form-label">
+              CPF do Gestor
+            </label>
+            <Form.Control
+              type="text"
               name="cpf_gestor"
               className="form-control"
               id="cpf_gestor"
+              maxLength={14}
               placeholder="Digite o cpf do gestor"
-              value={formData.cpf_gestor}
+              value={mask(formData.cpf_gestor || "")}
               onChange={handleChange}
+              isInvalid={!!errors?.cpf_gestor}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.cpf_gestor}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="nome_tecnico" className="form-label">Nome do Responsável Técnico pelo cadastro</label>
-            <input
+            <label htmlFor="nome_tecnico" className="form-label">
+              Nome do Responsável Técnico pelo cadastro
+            </label>
+            <Form.Control
               type="text"
               name="nome_tecnico"
               className="form-control"
@@ -99,23 +184,36 @@ function Formulario() {
               placeholder="Digite o nome responsável técnico pelo cadastro"
               value={formData.nome_tecnico}
               onChange={handleChange}
+              isInvalid={!!errors?.nome_tecnico}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.nome_tecnico}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="cpf_tecnico" className="form-label">CPF do Técnico Responsável pelo cadastro</label>
-            <input
+            <label htmlFor="cpf_tecnico" className="form-label">
+              CPF do Técnico Responsável pelo cadastro
+            </label>
+            <Form.Control
               type="text"
               name="cpf_tecnico"
               className="form-control"
               id="cpf_tecnico"
+              maxLength={14}
               placeholder="Digite o cpf do técnico responsável pelo cadastro"
-              value={formData.cpf_tecnico}
+              value={mask(formData.cpf_tecnico || "")}
               onChange={handleChange}
+              isInvalid={!!errors?.cpf_tecnico}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.cpf_tecnico}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="contato_tecnico" className="form-label">Contato do Técnico Responsável pelo cadastro</label>
-            <input
+            <label htmlFor="contato_tecnico" className="form-label">
+              Contato do Técnico Responsável pelo cadastro
+            </label>
+            <Form.Control
               type="text"
               name="contato_tecnico"
               className="form-control"
@@ -123,12 +221,18 @@ function Formulario() {
               placeholder="Digite o contato do técnico responsável pelo cadastro"
               value={formData.contato_tecnico}
               onChange={handleChange}
+              isInvalid={!!errors?.contato_tecnico}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.contato_tecnico}
+            </Form.Control.Feedback>
           </div>
           <h3 className="text-center texto">Qualificação do Beneficiário</h3>
           <div className="mb-3 mt-4">
-            <label htmlFor="nome_beneficiario" className="form-label">Nome do Beneficiário</label>
-            <input
+            <label htmlFor="nome_beneficiario" className="form-label">
+              Nome do Beneficiário
+            </label>
+            <Form.Control
               type="text"
               name="nome_beneficiario"
               className="form-control"
@@ -136,23 +240,36 @@ function Formulario() {
               placeholder="Digite o nome do beneficiário"
               value={formData.nome_beneficiario}
               onChange={handleChange}
+              isInvalid={!!errors?.nome_beneficiario}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.nome_beneficiario}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="cpf_beneficiario" className="form-label">CPF do Beneficiário</label>
-            <input
+            <label htmlFor="cpf_beneficiario" className="form-label">
+              CPF do Beneficiário
+            </label>
+            <Form.Control
               type="text"
               name="cpf_beneficiario"
               className="form-control"
               id="cpf_beneficiario"
+              maxLength={14}
               placeholder="Digite o cpf do beneficiário"
-              value={formData.cpf_beneficiario}
+              value={mask(formData.cpf_beneficiario || "")}
               onChange={handleChange}
+              isInvalid={!!errors?.cpf_beneficiario}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.cpf_beneficiario}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="contato_beneficiario" className="form-label">Contato do Beneficiário</label>
-            <input
+            <label htmlFor="contato_beneficiario" className="form-label">
+              Contato do Beneficiário
+            </label>
+            <Form.Control
               type="text"
               name="contato_beneficiario"
               className="form-control"
@@ -160,12 +277,20 @@ function Formulario() {
               placeholder="Digite o contato do beneficiário"
               value={formData.contato_beneficiario}
               onChange={handleChange}
+              isInvalid={!!errors?.contato_beneficiario}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.contato_beneficiario}
+            </Form.Control.Feedback>
           </div>
-          <h3 className="text-center texto">Qualificação da Área a ser Regularizada</h3>
+          <h3 className="text-center texto">
+            Qualificação da Área a ser Regularizada
+          </h3>
           <div className="mb-3 mt-4">
-            <label htmlFor="loteamento" className="form-label">Qual o nome do Loteamento?</label>
-            <input
+            <label htmlFor="loteamento" className="form-label">
+              Qual o nome do Loteamento?
+            </label>
+            <Form.Control
               type="text"
               name="loteamento"
               className="form-control"
@@ -173,11 +298,17 @@ function Formulario() {
               placeholder="Digite o nome do loteamento"
               value={formData.loteamento}
               onChange={handleChange}
+              isInvalid={!!errors?.loteamento}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.loteamento}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="endereco" className="form-label">Coloque o endereço do lote. Mesmo que não oficial</label>
-            <input
+            <label htmlFor="endereco" className="form-label">
+              Coloque o endereço do lote. Mesmo que não oficial
+            </label>
+            <Form.Control
               type="text"
               name="endereco"
               className="form-control"
@@ -185,11 +316,17 @@ function Formulario() {
               placeholder="Digite o endereço do lote, mesmo não oficial"
               value={formData.endereco}
               onChange={handleChange}
+              isInvalid={!!errors?.endereco}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.endereco}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="tamanho" className="form-label">Descreva o tamanho do lote em m2. Descrever frente x fundo</label>
-            <input
+            <label htmlFor="tamanho" className="form-label">
+              Descreva o tamanho do lote em m2. Descrever frente x fundo
+            </label>
+            <Form.Control
               type="text"
               name="tamanho"
               className="form-control"
@@ -197,11 +334,17 @@ function Formulario() {
               placeholder="Digite o tamnho do lote em m²"
               value={formData.tamanho}
               onChange={handleChange}
+              isInvalid={!!errors?.cpf_gestor}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.cpf_gestor}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="coordenada" className="form-label">Colocar ao menos uma coordenada Lat-Long ou UTM do centro do Lote</label>
-            <input
+            <label htmlFor="coordenada" className="form-label">
+              Colocar ao menos uma coordenada Lat-Long ou UTM do centro do Lote
+            </label>
+            <Form.Control
               type="text"
               name="coordenada"
               className="form-control"
@@ -209,12 +352,18 @@ function Formulario() {
               placeholder="Digite as coordenadas latitude e longitude"
               value={formData.coordenada}
               onChange={handleChange}
+              isInvalid={!!errors?.coordenada}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.coordenada}
+            </Form.Control.Feedback>
           </div>
           <h3 className="text-center texto">Qualificação do Estudo Técnico</h3>
           <div className="mb-3 mt-4">
-            <label htmlFor="caracterize" className="form-label">Caracterize a situação ambiental da área a ser regularizada</label>
-            <input
+            <label htmlFor="caracterize" className="form-label">
+              Caracterize a situação ambiental da área a ser regularizada
+            </label>
+            <Form.Control
               type="text"
               name="caracterize"
               className="form-control"
@@ -222,11 +371,17 @@ function Formulario() {
               placeholder="Digite até 500 caracteres"
               value={formData.caracterize}
               onChange={handleChange}
+              isInvalid={!!errors?.caracterize}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.caracterize}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="especifique" className="form-label">Especifique os sistemas de saneamento básico</label>
-            <input
+            <label htmlFor="especifique" className="form-label">
+              Especifique os sistemas de saneamento básico
+            </label>
+            <Form.Control
               type="text"
               name="especifique"
               className="form-control"
@@ -234,11 +389,18 @@ function Formulario() {
               placeholder="Digite até 500 caracteres"
               value={formData.especifique}
               onChange={handleChange}
+              isInvalid={!!errors?.especifique}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.especifique}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="geotecnicos" className="form-label">Caso necessário, propor intervenções para a prevenção e o controle de riscos geotécnicos e de inundações</label>
-            <input
+            <label htmlFor="geotecnicos" className="form-label">
+              Caso necessário, propor intervenções para a prevenção e o controle
+              de riscos geotécnicos e de inundações
+            </label>
+            <Form.Control
               type="text"
               name="geotecnicos"
               className="form-control"
@@ -246,11 +408,18 @@ function Formulario() {
               placeholder="Digite até 500 caracteres"
               value={formData.geotecnicos}
               onChange={handleChange}
+              isInvalid={!!errors?.geotecnicos}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.geotecnicos}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="recuperacao" className="form-label">Caso necessário, propor ações de recuperação de áreas degradadas e ou daquelas não passíveis de regularização ambiental.</label>
-            <input
+            <label htmlFor="recuperacao" className="form-label">
+              Caso necessário, propor ações de recuperação de áreas degradadas e
+              ou daquelas não passíveis de regularização ambiental.
+            </label>
+            <Form.Control
               type="text"
               name="recuperacao"
               className="form-control"
@@ -258,23 +427,39 @@ function Formulario() {
               placeholder="Digite até 500 caracteres"
               value={formData.recuperacao}
               onChange={handleChange}
+              isInvalid={!!errors?.recuperacao}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.recuperacao}
+            </Form.Control.Feedback>
           </div>
-          <div className="mb-3">
-            <label htmlFor="compravacao" className="form-label">Descreva a comprovação da melhoria das condições de sustentabilidade urbano-ambiental, considerados o uso adequado dos recursos hídricos, a não ocupação das áreas de risco e a proteção das unidades de conservação, quando for o caso</label>
-            <input
+          <Form.Group className="mb-3">
+            <Form.Label htmlFor="compravacao" className="form-label">
+              Descreva a comprovação da melhoria das condições de
+              sustentabilidade urbano-ambiental, considerados o uso adequado dos
+              recursos hídricos, a não ocupação das áreas de risco e a proteção
+              das unidades de conservação, quando for o caso
+            </Form.Label>
+            <Form.Control
               type="text"
               name="comprovacao"
               className="form-control"
               id="compravacao"
               placeholder="Digite até 500 caracteres"
-              value={formData.compravacao}
+              value={formData.comprovacao}
               onChange={handleChange}
+              isInvalid={!!errors?.comprovacao}
             />
-          </div>
+            <Form.Control.Feedback type="invalid">
+              {errors?.comprovacao}
+            </Form.Control.Feedback>
+          </Form.Group>
           <div className="mb-3">
-            <label htmlFor="habitabilidade" className="form-label">Descreva a comprovação da melhoria da habitabilidade dos moradores propiciada pela regularização proposta?</label>
-            <input
+            <label htmlFor="habitabilidade" className="form-label">
+              Descreva a comprovação da melhoria da habitabilidade dos moradores
+              propiciada pela regularização proposta?
+            </label>
+            <Form.Control
               type="text"
               name="habitabilidade"
               className="form-control"
@@ -282,11 +467,18 @@ function Formulario() {
               placeholder="Digite até 500 caracteres"
               value={formData.habitabilidade}
               onChange={handleChange}
+              isInvalid={!!errors?.habitabilidade}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.habitabilidade}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3">
-            <label htmlFor="garantia" className="form-label">Descreva como se dará a garantia de acesso público aos Recursos Hídricos</label>
-            <input
+            <label htmlFor="garantia" className="form-label">
+              Descreva como se dará a garantia de acesso público aos Recursos
+              Hídricos
+            </label>
+            <Form.Control
               type="text"
               name="garantia"
               className="form-control"
@@ -294,10 +486,16 @@ function Formulario() {
               placeholder="Digite até 500 caracteres"
               value={formData.garantia}
               onChange={handleChange}
+              isInvalid={!!errors?.garantia}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors?.garantia}
+            </Form.Control.Feedback>
           </div>
           <div className="mb-3 text-center">
-            <button type="submit" className="btn btn-primary text-center">Enviar Estudo</button>
+            <Button type="submit" className="btn btn-primary text-center">
+              Enviar Estudo
+            </Button>
           </div>
         </form>
       </div>
