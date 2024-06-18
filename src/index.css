@@ -11,3 +11,56 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+body{
+  background-color: #E5E5E5;
+}
+
+hr{
+  border: 0;
+  height: 4px;
+  width: 100%;
+  background: #008A3A;
+  margin: 20px 0;
+  
+}
+.d-block {
+  display: block !important;
+  width: 100%;
+}
+.btn {
+  background-color: #008A3A;
+  border: none;
+  color: white;
+  padding: 15px 58px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 23px 4px;
+  cursor: pointer;
+  border-radius: 5px; /* Bordas arredondadas, opcional */
+  box-shadow: 9px 8px 11px 2px rgba(0, 0, 0, 0.2);
+
+}
+.btn:hover {
+  background-color: #007934; /* Cor quando o botão é hover */
+}
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
+.logo{
+  text-align: center !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}

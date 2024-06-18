@@ -1,0 +1,17 @@
+[
+    {
+        "id": "altaneira",
+        "cover": "/image/altaneira.png",
+        "url": "https://www.altaneira.ce.gov.br/"
+    },
+    {
+        "id": "ambiente",
+        "cover": "/image/ambiente.png",
+        "url": "https://www.altaneira.ce.gov.br/sec-meioambiente/"
+    },
+    {
+        "id": "tuxtu",
+        "cover": "/image/SEPEA.png",
+        "url" : "https://tuxtu.com.br/sepea/"
+    }
+]
