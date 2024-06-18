@@ -359,10 +359,10 @@ function Formulario() {
               placeholder="Digite o tamnho do lote em m²"
               value={formData.tamanho}
               onChange={handleChange}
-              isInvalid={!!errors?.cpf_gestor}
+              isInvalid={!!errors?.tamanho}
             />
             <Form.Control.Feedback type="invalid">
-              {errors?.cpf_gestor}
+              {errors?.tamanho}
             </Form.Control.Feedback>
           </div>
           <div className="mb-3">
