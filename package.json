@@ -1,6 +1,7 @@
 {
   "name": "reurb",
   "version": "0.1.0",
+  "homepage": "https://{wilkerlisboa}.github.io/{sepea}",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^6.4.6",
@@ -19,6 +20,8 @@
     "zod": "^3.23.8"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -44,6 +47,7 @@
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.2"
+    "eslint-plugin-react": "^7.34.2",
+    "gh-pages": "^6.1.1"
   }
 }
