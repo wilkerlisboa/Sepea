@@ -1,7 +1,7 @@
 {
   "name": "reurb",
   "version": "0.1.0",
-  "homepage": "https://wilkerlisboa.github.io/sepea",
+  "homepage": "https://wilkerlisboa.github.io/home",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^6.4.6",
