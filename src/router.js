@@ -7,7 +7,7 @@ function AppRoutes(){
     return(
         <BrowserRouter>
             <Routes>
-                <Route path="/home" element={ <Sepea/>}></Route>
+                <Route path="/home" element={ <Home/>}></Route>
                 <Route path="/erro" element={ <Erro/> }></Route>
                 <Route path="/achievement" element={ <Achievement/> }></Route>
             </Routes>
