@@ -7,7 +7,7 @@ function Logo({ id, cover, url }) {
                 target="_blank"
                 className="d-block"
             >
-                <img src={cover} alt={id} className="img-fluid" />
+                <img src={`${process.env.PUBLIC_URL}${cover}`} alt={id} className="img-fluid" />
             </a>
         </div>
     );
