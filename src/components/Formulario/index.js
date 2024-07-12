@@ -460,10 +460,7 @@ function Formulario() {
           </div>
           <Form.Group className="mb-3">
             <Form.Label htmlFor="compravacao" className="form-label">
-              Descreva a comprovação da melhoria das condições de
-              sustentabilidade urbano-ambiental, considerados o uso adequado dos
-              recursos hídricos, a não ocupação das áreas de risco e a proteção
-              das unidades de conservação, quando for o caso
+            Descreva a comprovação da melhoria das condições de sustentabilidade urbano-ambiental, considerando o uso adequado dos recursos hídricos, a não ocupação das áreas de risco e a proteção das unidades de conservação, quando for o caso.
             </Form.Label>
             <Form.Control
               type="text"
